@@ -98,7 +98,7 @@ class AdminController extends AbstractController
             $entityManager->flush();
 
          //Ici on ajoute un message qu'on affichera un twig
-         $this->addFlash("Sucess", "Bravo, votre article est bien en ligne!");
+         $this->addFlash("sucess", " votre article est bien en ligne!");
 
          return $this->redirectToRoute("show_dashboard");
 
@@ -164,7 +164,7 @@ class AdminController extends AbstractController
         $entityManager->persist($article);
         $entityManager->flush();
 
-        $this->addFlash("Sucess", " L'article " . $article->getTitle(). " à bien été modifié ! ");
+        $this->addFlash("sucess", " L'article " . $article->getTitle(). " à bien été modifié ! ");
 
         return $this->redirectToRoute("show_dashboard");
       
