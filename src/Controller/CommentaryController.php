@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Article;
 use App\Entity\Commentary;
 use App\Form\CommentaryFormType;
@@ -14,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class CommentaryController extends AbstractController
 {
     /**
-     * @Route("/ajoyter-un-commentarie?article_id={id}", name="add_commentary", methods={"GET|POST"})
+     * @Route("/ajouter-un-commentarie?article_id={id}", name="add_commentary", methods={"GET|POST"})
      */
     public function addCommentary(Article $article, Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -22,6 +23,36 @@ class CommentaryController extends AbstractController
 
       $form = $this->createForm(CommentaryFormType::class, $commentary)
             ->handleRequest($request);
+
+            # Cas où le formulaire n'est pas valide. Lorsque le champ 'comment' est vide, il y la contrainte NotBlank qui se déclenche.
+            if($form->isSubmitted() && $form->isValid() === false) {
+              $this->addFlash('warning', 'Votre commentaire est vide !');
+
+              return $this->redirectToRoute('show_article', [
+                'cat_alias'     => $article->getCategory()->getAlias(),
+                'article_alias' => $article->getAlias(),
+                'id'            => $article->getId()
+              ]);
+              
+            }
+
+            if($form->isSubmitted() && $form->isValid()) {
+
+              $commentary->setArticle($article);
+              $commentary->setCreatedAt(new DateTime);
+              $commentary->setUpdatedAt(new DateTime);
+ 
+              $entityManager->persist($commentary);
+              $entityManager->flush();
+
+              $this->addFlash('success', "Vous avez commenté l'article <strong>". $article->getTitle() ." </strong> avec succés !");
+              
+              return $this->redirectToRoute('show_article', [
+                'cat_alias'     => $article->getCategory()->getAlias(),
+                'article_alias' => $article->getAlias(),
+                'id'            => $article->getId()
+              ]);
+            }
 
       return $this->render('rendered/form_commentary.html.twig', [
           'form' => $form->createView()
