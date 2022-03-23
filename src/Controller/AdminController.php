@@ -13,6 +13,8 @@ use App\Form\ArticleFormType;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/admin")
@@ -22,10 +24,30 @@ class AdminController extends AbstractController
 
     /**
      * @Route("/tableau-de-bord", name="show_dashboard", methods={"GET"})
+     * // IsGranted("ROLE_ADMIN")
      */
    public function showDashboard(EntityManagerInterface $entityManager): Response
    {
+       /*
+         * try/catch fait partie de PHP nativement.
+         * Cela a été créé pour gérer les class Exception (erreur).
+         * On se sert d'un try/catch lorsqu'on utilise des méthodes (fonctions) QUI LANCE (throw) une Exception.
+         * Si la méthode lance l'erreur pendant son exécution, alors l'Excepetion sera 'attrapée' (catch).
+         * Le code dans les accolades du catch sera alors exécuté.
+         */
+       try{
+
+       $this->denyAccessUnlessGranted('ROLE_ADMIN');
+       
+       }
+       catch(AccessDeniedException $exception) {
+
+           $this->addFlash('warning', 'Cette partie du site est réservée.');
+           return $this->redirectToRoute('default_home');
+       }
+
        $articles = $entityManager->getRepository(Article::class)->findAll();
+       $categories = $entityManager->
        
        return $this->render("admin/show_dashboard.html.twig", [
            "articles" => $articles,   
@@ -57,6 +79,9 @@ class AdminController extends AbstractController
            $article->setAlias($slugger->slug($article->getTitle()) );
            $article->setCreatedAt(new DateTime());
            $article->setupdatedAt(new DateTime());
+
+           //Association d'un auteur à un article
+           $article->setAuthor($this->getUser());
 
            //Variablilisation du fichier "photo" uploadé.
            $file = $form->get("photo")->getData();

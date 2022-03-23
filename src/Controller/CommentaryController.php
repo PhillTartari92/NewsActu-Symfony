@@ -41,6 +41,8 @@ class CommentaryController extends AbstractController
               $commentary->setArticle($article);
               $commentary->setCreatedAt(new DateTime);
               $commentary->setUpdatedAt(new DateTime);
+
+              $commentary->setAuthor($this->getUser());
  
               $entityManager->persist($commentary);
               $entityManager->flush();

@@ -34,7 +34,7 @@ class DataFixtures extends Fixture
             "Espace",
             "Sciences",
             "Mode",
-            "Informatqiue",
+            "Informatique",
             "Écologie",
             "Cinéma",
             "Hi Tech",

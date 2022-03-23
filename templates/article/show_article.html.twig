@@ -31,8 +31,17 @@
 		</div>
 	</div>
 
-    {# {{ render(controller('App\\Controller\\CommentaryController::addCommentary', {'id': article.id} )) }} #}
-	{{ render(url('add_commentary', {'id': article.id}) ) }}
+  {% if app.user %}
+        {# {{ render(controller('App\\Controller\\CommentaryController::addCommentary', {'id': article.id} )) }}#}
+        {{ render(url('add_commentary', {'id': article.id}) ) }}
+    {% else %}
+        <div class="row">
+            <div class="col-8 mx-auto text-center my-3">
+                <p class="h4"> Vous devez être connecté pour commenter cet article </p>
+                <a class="d-block col-3 btn btn-info mx-auto" href="{{ path('app_login') }}">Connexion</a>
+            </div>
+        </div>
+    {% endif %}
 
 	<hr>
 	<h3>Espace Commentaires</h3>
